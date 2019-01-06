@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ContentModelStore">
+    <e p="$APPLICATION_CONFIG_DIR$/extensions" t="IncludeRecursive" />
+    <e p="$APPLICATION_CONFIG_DIR$/scratches" t="IncludeRecursive" />
+    <e p="$USER_HOME$/.Rider2018.2/system/extResources" t="IncludeRecursive" />
+    <e p="$USER_HOME$/.Rider2018.2/system/resharper-host/local/Transient/ReSharperHost/v182/SolutionCaches/_RacingGame.-1536988385.00" t="ExcludeRecursive" />
+    <e p="$PROJECT_DIR$" t="IncludeRecursive">
+      <e p="Assembly-CSharp.csproj" t="IncludeRecursive" />
+      <e p="Assets/Scripts" t="Include">
+        <e p="Background" t="Include">
+          <e p="BackgroundScript.cs" t="Include" />
+        </e>
+        <e p="Camera" t="Include">
+          <e p="CameraController.cs" t="Include" />
+        </e>
+        <e p="Client" t="Include">
+          <e p="TCPClient.cs" t="Include" />
+        </e>
+        <e p="Player" t="Include">
+          <e p="AnimationState" t="Include">
+            <e p="IAnimatorState.cs" t="Include" />
+            <e p="OnAscendingState.cs" t="Include" />
+            <e p="OnDescendingState.cs" t="Include" />
+            <e p="OnFloorState.cs" t="Include" />
+            <e p="OnLoseState.cs" t="Include" />
+            <e p="OnSuspendState.cs" t="Include" />
+          </e>
+          <e p="IState.cs" t="Include" />
+          <e p="LeftState.cs" t="Include" />
+          <e p="MiddleState.cs" t="Include" />
+          <e p="Player.cs" t="Include" />
+          <e p="RightState.cs" t="Include" />
+        </e>
+        <e p="Road" t="Include">
+          <e p="BlockGenerator.cs" t="Include" />
+          <e p="RoadGenerator.cs" t="Include" />
+        </e>
+        <e p="Scene" t="Include">
+          <e p="SceneLoader.cs" t="Include" />
+        </e>
+        <e p="Timer" t="Include">
+          <e p="Timer.cs" t="Include" />
+        </e>
+        <e p="UI" t="Include">
+          <e p="ButtonHandler.cs" t="Include" />
+          <e p="CanvasGameOver.cs" t="Include" />
+          <e p="InputFieldInput.cs" t="Include" />
+          <e p="PlayButtonHandler.cs" t="Include" />
+        </e>
+      </e>
+      <e p="Assets/Supercyan Character Pack Free Sample" t="Include">
+        <e p="Scripts" t="Include">
+          <e p="CameraLogic.cs" t="Include" />
+          <e p="Demo.cs" t="Include" />
+          <e p="SimpleCharacterControl.cs" t="Include" />
+        </e>
+      </e>
+      <e p="Library" t="ExcludeRecursive" />
+      <e p="RacingGame.sln" t="IncludeFlat" />
+      <e p="Temp" t="ExcludeRecursive">
+        <e p="bin" t="ExcludeRecursive" />
+      </e>
+      <e p="obj" t="ExcludeRecursive" />
+      <e p="packages" t="ExcludeRecursive" />
+    </e>
+  </component>
+</project>
