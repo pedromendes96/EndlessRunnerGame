@@ -49,10 +49,18 @@ namespace Road{
                     return;
                 }
 
-                gameObject.tag = "Block";
-                gameObject.transform.SetParent(road.transform);
-                var obstaclePosition = new Vector3(road.transform.position.x + movement, road.transform.position.y + heightGameObjects[index], road.transform.position.z + zVal);
-                gameObject.transform.position = obstaclePosition;
+                try
+                {
+                    gameObject.tag = "Block";
+                    gameObject.transform.SetParent(road.transform);
+                    var obstaclePosition = new Vector3(road.transform.position.x + movement, road.transform.position.y + heightGameObjects[index], road.transform.position.z + zVal);
+                    gameObject.transform.position = obstaclePosition;
+                }
+                catch (Exception e)
+                {
+                    gameObject.SetActive(false);
+                }
+                
             }
         }
     }

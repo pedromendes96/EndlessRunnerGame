@@ -22,8 +22,6 @@ namespace Player.AnimatorState{
         public override void UpdatePosition()
         {
             float zVal = Mathf.Round(_player.transform.position.z * 100) / 100;
-            // Debug.Log("ON SUSPEND - zVal: " + zVal);
-            // Debug.Log("ON SUSPEND - finalWidth: " + finalWidth);
             if(zVal + ERROR > finalWidth){
                 _player.UpdateAnimatorState(new OnDescendingState(_player));
             }else{

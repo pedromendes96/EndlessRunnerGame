@@ -12,7 +12,7 @@ namespace Player.AnimatorState{
             _player = player;
             _player.GetRigidbody().useGravity = false;
             AbsoluteHeight = (Mathf.Round(_player.transform.position.y * 100) / 100) + JumpHeight;
-            // Debug.Log("AbsoluteHeight: " + AbsoluteHeight);
+            Debug.Log("AbsoluteHeight: " + AbsoluteHeight);
             _player.GetAnimator().SetTrigger("OnUp");
         }
 
@@ -24,15 +24,11 @@ namespace Player.AnimatorState{
         public override void UpdatePosition()
         {
             float yVal = Mathf.Round(_player.transform.position.y * 100) / 100;
-            // Debug.Log("ON ASCENDING - yVal: " + yVal);
-            // Debug.Log("ON ASCENDING - AbsoluteHeight: " + AbsoluteHeight);
             if(yVal + ERROR > AbsoluteHeight){
                 _player.UpdateAnimatorState(new OnSuspendState(_player));
             }else{
                 float delta = 1 * _player.jumpSpeed * Time.deltaTime;
                 float YPosDelta = Mathf.Round((yVal + delta) * 100) / 100;
-                // Debug.Log("delta: " + delta);
-                // Debug.Log("YPosDelta: " + YPosDelta);
                 if(Math.Abs(YPosDelta) > Math.Abs(AbsoluteHeight)){
                     float remainder = AbsoluteHeight - yVal;
                     _player.transform.Translate(0, remainder, 1 * _player.speed * Time.deltaTime);

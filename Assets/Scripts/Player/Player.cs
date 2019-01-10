@@ -1,20 +1,26 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Timers;
+﻿using System.Collections;
+using Client;
 using Player.AnimatorState;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
 namespace Player
 {
-    public class Player : MonoBehaviour
+    public class Player : MonoBehaviour, Subscriber
     {
         float distToGround;
         private bool isGrounded;
 
+        private const string MOBILE_LEFT = "LEFT";
+        private const string MOBILE_RIGHT = "RIGHT";
+        private const string MOBILE_DOWN = "DOWN";
+        private const string MOBILE_TOP = "TOP";
+        private const string MOBILE_STOPPED = "STOPPED";
+        private bool restart;
+
         public Canvas GameOverCanvas;
-        
+
+        public SceneLoaderMain SceneLoaderMain;
         public bool IsPlaying { get; set; }
 
         public float fallingSpeed;
@@ -31,15 +37,22 @@ namespace Player
         // Animations
         private Animator animator;
         private Rigidbody _body;
-
+        
+        private bool updatedData = false;
+        private int verticalDirection = 0;
+        private int horizontalDirection = 0;
+        
         // Use this for initialization
         void Start()
         {
+            restart = false;
             IsPlaying = true;
             _body = GetComponent<Rigidbody>();
             positonState = new MiddleState(this);
             animator = GetComponent<Animator>();
             animatorState = new OnFloorState(this);
+            TCPClient.Instance.AddSubscriber(this);
+            Debug.Log("TCPClient.Instance.IsConnected -> " + TCPClient.Instance.IsConnected);
         }
         
         public bool IsGrounded()
@@ -49,14 +62,36 @@ namespace Player
         
 
         void Update(){
-            if(Input.GetKeyDown(KeyCode.UpArrow)){
-                if(animatorState.CanJump()){
+            if (restart)
+            {
+                SceneLoaderMain.LoadSceneAsync("Main");
+            }
+            if (TCPClient.Instance.IsConnected)
+            {
+                if(verticalDirection == 1){
+                    if (!animatorState.CanJump()) return;
                     animatorState = new OnAscendingState(this);
+                }else switch (horizontalDirection)
+                {
+                    case -1:
+                        positonState.Left();
+                        break;
+                    case 1:
+                        positonState.Right();
+                        break;
                 }
-            }else if(Input.GetKeyDown(KeyCode.LeftArrow)){
-                positonState.Left();
-            }else if(Input.GetKeyDown(KeyCode.RightArrow)){
-                positonState.Right();
+            }
+            else
+            {
+                if(Input.GetKeyDown(KeyCode.UpArrow)){
+                    if(animatorState.CanJump()){
+                        animatorState = new OnAscendingState(this);
+                    }
+                }else if(Input.GetKeyDown(KeyCode.LeftArrow)){
+                    positonState.Left();
+                }else if(Input.GetKeyDown(KeyCode.RightArrow)){
+                    positonState.Right();
+                }
             }
         }
 
@@ -133,12 +168,6 @@ namespace Player
         void FixedUpdate()
         {
             animatorState.UpdatePosition();
-            // float moveHorizontal = Input.GetAxis ("Horizontal");
-            // float moveVertical = Input.GetAxis ("Vertical");
-    
-            // Vector3 movement = new Vector3 (moveHorizontal, 0.0f, moveVertical);
-    
-            // _body.AddForce (movement * speed);
         }
 
         public void UpdateAnimatorState(IAnimatorState _animatorState){
@@ -161,6 +190,70 @@ namespace Player
 
         public Animator GetAnimator(){
             return animator;
+        }
+
+        public void Update(string data)
+        {
+            Debug.Log("Received data: " + data);
+            var position = data.Trim();
+            switch (position)
+            {
+                case MOBILE_TOP:
+                    verticalDirection = 1;
+                    horizontalDirection = 0;
+                    updatedData = true;
+                    break;
+                case MOBILE_DOWN:
+                    verticalDirection = 0;
+                    horizontalDirection = 0;
+                    updatedData = true;
+                    break;
+                case MOBILE_RIGHT:
+                    verticalDirection = 0;
+                    horizontalDirection = 1;
+                    updatedData = true;
+                    break;
+                case MOBILE_LEFT:
+                    verticalDirection = 0;
+                    horizontalDirection = -1;
+                    updatedData = true;
+                    break;
+                case MOBILE_STOPPED:
+                    verticalDirection = 0;
+                    horizontalDirection = 0;
+                    updatedData = true;
+                    break;
+                case "PLAY":
+                    if (!IsPlaying)
+                    {
+                        restart = true;
+                    }
+                    break;
+                default:
+                    Debug.Log("Error in message -> " + position);
+                    break;
+            }
+        }
+        
+        IEnumerator LoadYourAsyncScene(string name)
+        {
+            // The Application loads the Scene in the background as the current Scene runs.
+            // This is particularly good for creating loading screens.
+            // You could also load the Scene by using sceneBuildIndex. In this case Scene2 has
+            // a sceneBuildIndex of 1 as shown in Build Settings.
+
+            AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(name);
+
+            // Wait until the asynchronous scene fully loads
+            while (!asyncLoad.isDone)
+            {
+                yield return null;
+            }
+        }
+        
+        void OnApplicationQuit()
+        {
+            TCPClient.Instance.Close();
         }
     }
 }

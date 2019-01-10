@@ -56,6 +56,8 @@
   <ItemGroup>
     <Compile Include="Assets\Scripts\Background\BackgroundScript.cs" />
     <Compile Include="Assets\Scripts\Camera\CameraController.cs" />
+    <Compile Include="Assets\Scripts\Client\Publisher.cs" />
+    <Compile Include="Assets\Scripts\Client\Subscriber.cs" />
     <Compile Include="Assets\Scripts\Client\TCPClient.cs" />
     <Compile Include="Assets\Scripts\Player\AnimationState\IAnimatorState.cs" />
     <Compile Include="Assets\Scripts\Player\AnimationState\OnAscendingState.cs" />
@@ -71,10 +73,12 @@
     <Compile Include="Assets\Scripts\Road\BlockGenerator.cs" />
     <Compile Include="Assets\Scripts\Road\RoadGenerator.cs" />
     <Compile Include="Assets\Scripts\Scene\SceneLoader.cs" />
+    <Compile Include="Assets\Scripts\Scene\SceneLoaderMain.cs" />
     <Compile Include="Assets\Scripts\Timer\Timer.cs" />
     <Compile Include="Assets\Scripts\UI\ButtonHandler.cs" />
     <Compile Include="Assets\Scripts\UI\CanvasGameOver.cs" />
     <Compile Include="Assets\Scripts\UI\InputFieldInput.cs" />
+    <Compile Include="Assets\Scripts\UI\Message.cs" />
     <Compile Include="Assets\Scripts\UI\PlayButtonHandler.cs" />
     <Compile Include="Assets\Supercyan Character Pack Free Sample\Scripts\CameraLogic.cs" />
     <Compile Include="Assets\Supercyan Character Pack Free Sample\Scripts\Demo.cs" />

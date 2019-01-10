@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace Player
 {
@@ -15,12 +16,14 @@ namespace Player
         }
         public override void Left()
         {
+            Debug.Log("Ok player is on middle and will move to left!!!");
             _player.UpdateExpectedPosition(XPosition[POSITION.LEFT]);
             _player.UpdateState(new LeftState(_player, XPosition));
         }
 
         public override void Right()
         {
+            Debug.Log("Ok player is on middle and will move to right!!!");
             _player.UpdateExpectedPosition(XPosition[POSITION.RIGHT]);
             _player.UpdateState(new RightState(_player,XPosition));
         }

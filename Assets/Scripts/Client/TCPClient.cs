@@ -5,12 +5,13 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
+using Client;
 using UnityEngine;
 
-public sealed class TCPClient
+public sealed class TCPClient : Publisher
 {
     // The port number for the remote device.  
-    private const int port = 9000;
+    private const int port = 9001;
     // ManualResetEvent instances signal completion.  
     private ManualResetEvent connectDone =
         new ManualResetEvent(false);
@@ -19,14 +20,18 @@ public sealed class TCPClient
     private ManualResetEvent receiveDone =
         new ManualResetEvent(false);
 
+    private List<Subscriber> Subscribers;
+    byte[] bytes = new byte[1024];
+
 
     // The response from the remote device.  
     private String response = String.Empty;
     private static readonly TCPClient instance = new TCPClient();
 
     public bool IsConnected { get ; set; }
+    private bool IsWaitingData = false;
 
-    private Socket client;
+    private Socket server;
 
     // Explicit static constructor to tell C# compiler
     // not to mark type as beforefieldinit
@@ -34,9 +39,15 @@ public sealed class TCPClient
     {
     }
 
+    public ManualResetEvent GetSendDone()
+    {
+        return sendDone;
+    }
+
     private TCPClient()
     {
         IsConnected = false;
+        Subscribers = new List<Subscriber>();
     }
 
     public static TCPClient Instance
@@ -46,6 +57,8 @@ public sealed class TCPClient
             return instance;
         }
     }
+    
+    
 
     public void StartClient(IPAddress ipAddress)
     {
@@ -57,37 +70,39 @@ public sealed class TCPClient
             // Debug.Log(String.Format("It will point to IP -> {0} and the port -> {1}",remoteEP.Address,remoteEP.Port));
 
             // Create a TCP/IP socket.  
-            client = new Socket(ipAddress.AddressFamily,
+            server = new Socket(ipAddress.AddressFamily,
                 SocketType.Stream, ProtocolType.Tcp);
 
             // Connect to the remote endpoint.  
-            client.BeginConnect(remoteEP,
-                new AsyncCallback(ConnectCallback), client);
-            connectDone.WaitOne();
-
-            // // Send test data to the remote device.  
-            // Send(client, "This is a test<EOF>");
-            // sendDone.WaitOne();
-
-            // // Receive the response from the remote device.  
-            // Receive(client);
-            // receiveDone.WaitOne();
-
-            // // Write the response to the console
-            // Debug.Log(String.Format("Response received : {0}", response));
+            server.Connect(remoteEP);
+            if (server.Connected)
+            {
+                IsConnected = true;
+                var thread = new Thread(CallReceive);
+                thread.Start();
+                Debug.Log("Server is connected!!!");
+            }
         }
         catch (Exception e)
         {
-            // Debug.Log(e.ToString());
+            Debug.LogException(e);
         }
     }
 
     public void Close()
     {
-        // Release the socket.  
-        client.Shutdown(SocketShutdown.Both);
-        client.Close();
-        IsConnected = false;
+        // Release the socket.
+        try
+        {
+            Debug.Log("Trying to close the socket!");
+            server.Shutdown(SocketShutdown.Both);
+            server.Close();
+            IsConnected = false;
+        }
+        catch (Exception e)
+        {
+            Debug.LogException(e);
+        }
     }
 
     private void ConnectCallback(IAsyncResult ar)
@@ -100,35 +115,54 @@ public sealed class TCPClient
             // Complete the connection.  
             client.EndConnect(ar);
 
-            // Debug.Log(String.Format("Socket connected to {0}",
-            //    client.RemoteEndPoint));
+            Debug.Log(String.Format("Socket connected to {0}",client.RemoteEndPoint));
 
             IsConnected = true;
 
             // Signal that the connection has been made.  
             connectDone.Set();
+            
+            var thread = new Thread(CallReceive);
+            thread.Start();
         }
         catch (Exception e)
         {
-            // Debug.Log(e.ToString());
+            Debug.LogException(e);
         }
     }
 
-    private void Receive()
+    private void CallReceive()
+    {
+        while (IsConnected)
+        {
+//            if (!IsWaitingData)
+//            {
+                Receive();
+                Debug.Log("Waiting data from socket!");
+                IsWaitingData = true;
+//            }
+        }
+    }
+
+    public void Receive()
     {
         try
         {
-            // Create the state object.  
-            StateObject state = new StateObject();
-            state.workSocket = client;
-
-            // Begin receiving the data from the remote device.  
-            client.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0,
-                new AsyncCallback(ReceiveCallback), state);
+            int bytesRec = server.Receive(bytes);
+            response = Encoding.ASCII.GetString(bytes, 0, bytesRec);
+            Publish();
+            IsWaitingData = false;
+//            // Create the state object.  
+//            StateObject state = new StateObject();
+//            state.workSocket = client;
+//
+//            // Begin receiving the data from the remote device.  
+//            client.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0,
+//                new AsyncCallback(ReceiveCallback), state);
         }
         catch (Exception e)
         {
-            // Debug.Log(e.ToString());
+            Debug.LogException(e);
         }
     }
 
@@ -140,44 +174,32 @@ public sealed class TCPClient
             // from the asynchronous state object.  
             StateObject state = (StateObject)ar.AsyncState;
             Socket client = state.workSocket;
+            client.NoDelay = true;
 
             // Read data from the remote device.  
             int bytesRead = client.EndReceive(ar);
 
-            if (bytesRead > 0)
-            {
-                // There might be more data, so store the data received so far.  
-                state.sb.Append(Encoding.ASCII.GetString(state.buffer, 0, bytesRead));
+            response = Encoding.ASCII.GetString(state.buffer, 0, bytesRead);
 
-                // Get the rest of the data.  
-                client.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0,
-                    new AsyncCallback(ReceiveCallback), state);
-            }
-            else
-            {
-                // All the data has arrived; put it in response.  
-                if (state.sb.Length > 1)
-                {
-                    response = state.sb.ToString();
-                }
-                // Signal that all bytes have been received.  
-                receiveDone.Set();
-            }
+            Debug.Log("From phone:" + response);
+            // Signal that all bytes have been received.  
+            receiveDone.Set();
+            Publish();
+            IsWaitingData = false;
         }
         catch (Exception e)
         {
-            // Debug.Log(e.ToString());
+            Debug.LogException(e);
         }
     }
 
-    private void Send(String data)
+    public void Send(String data)
     {
         // Convert the string data to byte data using ASCII encoding.  
         byte[] byteData = Encoding.ASCII.GetBytes(data);
 
-        // Begin sending the data to the remote device.  
-        client.BeginSend(byteData, 0, byteData.Length, 0,
-            new AsyncCallback(SendCallback), client);
+        Debug.Log("Sending the data to the phone!");
+        server.Send(byteData);
     }
 
     private void SendCallback(IAsyncResult ar)
@@ -193,14 +215,33 @@ public sealed class TCPClient
 
             // Signal that all bytes have been sent.  
             sendDone.Set();
+            
+            Debug.Log("Data sended to the phone!");
         }
         catch (Exception e)
         {
-            // Debug.Log(e.ToString());
+            Debug.LogException(e);
         }
     }
 
 
+    public void AddSubscriber(Subscriber subscriber)
+    {
+        Subscribers.Add(subscriber);
+    }
+
+    public void RemoveSubscriber(Subscriber subscriber)
+    {
+        Subscribers.Remove(subscriber);
+    }
+
+    public void Publish()
+    {
+        foreach (var subscriber in Subscribers)
+        {
+            subscriber.Update(response);
+        }
+    }
 }
 
 public class StateObject

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace Player
 {
@@ -15,6 +16,7 @@ namespace Player
 
         public override void Right()
         {
+            Debug.Log("Ok player is on left and will move to middle!!!");
             _player.UpdateExpectedPosition(XPosition[POSITION.CENTER]);
             _player.UpdateState(new MiddleState(_player, XPosition));
         }

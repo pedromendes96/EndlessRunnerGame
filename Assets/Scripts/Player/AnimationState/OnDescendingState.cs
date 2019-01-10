@@ -40,7 +40,7 @@ namespace Player.AnimatorState{
         {
             if (isGameOver)
                 _player.GameOverAction();
-            // Debug.Log("ISGROUNDED: " + _player.IsGrounded);
+            Debug.Log("ISGROUNDED: " + _player.IsGrounded());
             if(!_player.IsGrounded()){
                 float delta = -1 * _player.fallingSpeed * Time.deltaTime;
                 _player.transform.Translate(0, delta, 1 * _player.speed * Time.deltaTime);

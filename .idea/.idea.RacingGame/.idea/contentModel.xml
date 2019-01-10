@@ -15,6 +15,8 @@
           <e p="CameraController.cs" t="Include" />
         </e>
         <e p="Client" t="Include">
+          <e p="Publisher.cs" t="Include" />
+          <e p="Subscriber.cs" t="Include" />
           <e p="TCPClient.cs" t="Include" />
         </e>
         <e p="Player" t="Include">
@@ -38,6 +40,7 @@
         </e>
         <e p="Scene" t="Include">
           <e p="SceneLoader.cs" t="Include" />
+          <e p="SceneLoaderMain.cs" t="Include" />
         </e>
         <e p="Timer" t="Include">
           <e p="Timer.cs" t="Include" />
@@ -46,6 +49,7 @@
           <e p="ButtonHandler.cs" t="Include" />
           <e p="CanvasGameOver.cs" t="Include" />
           <e p="InputFieldInput.cs" t="Include" />
+          <e p="Message.cs" t="Include" />
           <e p="PlayButtonHandler.cs" t="Include" />
         </e>
       </e>

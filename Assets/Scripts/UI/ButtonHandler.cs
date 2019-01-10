@@ -14,11 +14,9 @@ public class ButtonHandler : MonoBehaviour {
 	public void OnClick(){
 		var ip = inputField.text;
 		if(ValidateIPv4(ip)){
-			IPAddress iPAddress;
-			var parsed = IPAddress.TryParse(ip.Replace(".",""), out iPAddress);
 			Warning.color = Color.white;
 			Warning.text = "Starting the connection...";
-			TCPClient.Instance.StartClient(iPAddress);
+			TCPClient.Instance.StartClient(IPAddress.Parse(ip));
 		}else{
 			Warning.color = Color.red;
 			Warning.text = "Can't connect since it's not a valid IP.";

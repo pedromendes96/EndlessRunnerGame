@@ -18,7 +18,7 @@ namespace Player.AnimatorState{
         public override void UpdatePosition()
         {
             var result = Physics.Raycast(_player.transform.position, Vector3.down, 10f);
-            Debug.Log("Result:" + result);
+            Debug.Log("Can verify that has floor? :" + result);
             if (!result)
             {
                 _player.UpdateAnimatorState(new OnDescendingState(_player));

@@ -50,7 +50,6 @@ namespace Road
             roadsList = new List<GameObject>();
             roadsList.Add(firstRoad);
             totalZ = getZSize(firstRoad);
-            // Debug.Log(totalZ);
         }
 
         private float getZSize(GameObject gameObject)
@@ -64,7 +63,7 @@ namespace Road
                 }
                 catch (Exception e)
                 {
-                    // Debug.LogException(e);
+                    Debug.LogException(e);
                 }
             }
             return total;

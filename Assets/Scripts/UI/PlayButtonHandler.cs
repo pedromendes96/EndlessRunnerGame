@@ -10,14 +10,15 @@ public class PlayButtonHandler : MonoBehaviour
 	
 	public void OnClick()
 	{
+		var objects = GameObject.FindGameObjectsWithTag("Static");
+		foreach (var gameObject in objects)
+		{
+			gameObject.SetActive(false);
+		}
+		SceneLoader.LoadSceneAsync("Main");
 //		if (TCPClient.Instance.IsConnected)
 //		{
-			var objects = GameObject.FindGameObjectsWithTag("Static");
-			foreach (var gameObject in objects)
-			{
-				gameObject.SetActive(false);
-			}
-			SceneLoader.LoadSceneAsync("Main");
+//			
 //		}
 	}
 }
